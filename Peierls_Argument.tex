@@ -1,0 +1,942 @@
+\documentclass[11pt]{article}
+
+% ============================================================================
+%  The Peierls Argument: a complete proof
+%
+%  Companion document to Ising_Model.tex (the structured transcription of
+%  Chapter 3 of Friedli & Velenik, "Statistical Mechanics of Lattice
+%  Systems"). NOTE: this entire document is an ADDITION beyond the book's
+%  transcription: it formalizes in full the proofs that Ising_Model.tex only
+%  summarizes in Section 3.7.2 (Lemma 3.37, an entropy bound replacing
+%  Lemma 3.38, and the deduction of a phase transition at low temperature,
+%  item 3 of Theorem 3.25).
+%  References of the form "Lemma 3.xx" point to the numbering of the
+%  transcription (= the book); internal results are numbered independently.
+% ============================================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools,mathrsfs}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+% --- theorem environments (as in Ising_Model.tex) ---------------------------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% --- notation: identical to Ising_Model.tex ---------------------------------
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rgeq}{\R_{\ge 0}}
+\newcommand{\fin}{\Subset}          % finite subset of Z^d
+\newcommand{\incr}{\Uparrow}        % van Hove convergence to Z^d
+\newcommand{\La}{\Lambda}
+\newcommand{\sg}{\sigma}
+\newcommand{\Ham}{\mathcal{H}}
+\newcommand{\Eset}{\mathscr{E}}
+\newcommand{\avg}[1]{\langle #1 \rangle}
+\newcommand{\meanp}[1]{\langle #1 \rangle^{+}}
+\newcommand{\meanm}[1]{\langle #1 \rangle^{-}}
+% --- additional notation for this document only -----------------------------
+\newcommand{\dualZ}{(\Z^2)^*}       % dual lattice Z^2 + (1/2,1/2)
+\newcommand{\Intr}{\mathrm{Int}}    % interior of a contour
+\newcommand{\Extr}{\mathrm{Ext}}    % exterior of a contour
+\newcommand{\Gam}{\Gamma}           % contour family of a configuration
+\newcommand{\dedges}{\mathscr{E}^*} % dual disagreement edges
+
+\title{\textbf{The Peierls Argument: a complete proof}\\[4pt]
+\large Companion to the transcription of Chapter 3 of\\
+Friedli \& Velenik, \emph{Statistical Mechanics of Lattice Systems}}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{%
+\textbf{Status of this document.} Everything below is an \emph{addition}
+relative to the transcription \texttt{Ising\_Model.tex}: it expands the proof
+summaries of \S3.7.2 there into complete proofs. Statements quoted from the
+book keep their book numbering in brackets; all other formulations,
+intermediate lemmas and proof details are ours and should not be mistaken for
+the source text.}}
+
+\section{Setting and main statement}
+\label{sec:setting}
+
+Throughout, $d=2$ and $h=0$. We work in the boxes
+$B(n)=\{-n,\dots,n\}^2\fin\Z^2$ with the $+$ boundary condition: by
+Definition~3.3 of the transcription, the Gibbs distribution
+$\mu^{+}_{B(n);\beta,0}$ on
+\[
+  \Omega^{+}_{B(n)}
+  =\{\omega\in\{-1,1\}^{\Z^2} : \omega_i=+1 \ \forall i\notin B(n)\}
+\]
+is
+\[
+  \mu^{+}_{B(n);\beta,0}(\omega)
+    =\frac{e^{-\Ham^{+}_{B(n);\beta,0}(\omega)}}{Z^{+}_{B(n);\beta,0}},
+  \qquad
+  \Ham^{+}_{B(n);\beta,0}(\omega)
+    =-\beta\!\!\sum_{\substack{\{i,j\}\in\Eset_{\Z^2}\\ \{i,j\}\cap B(n)\neq\varnothing}}\!\!
+       \sg_i(\omega)\sg_j(\omega),
+\]
+where $\Eset_{\Z^2}$ denotes the set of nearest-neighbour edges of $\Z^2$ and
+spins outside $B(n)$ are frozen to $+1$.
+
+The goal of this document is a complete proof of:
+
+\begin{theorem}[low-temperature phase transition; existence part of item 3 of Theorem 3.25]
+\label{thm:main}
+Let $d=2$, $h=0$. There exists $\beta_0<\infty$ such that for every
+$\beta\ge\beta_0$,
+\[
+  m^*(\beta)=\meanp{\sg_0}_{\beta,0}\ \ge\ \tfrac12\ >\ 0 .
+\]
+Consequently $\meanp{\cdot}_{\beta,0}\neq\meanm{\cdot}_{\beta,0}$ for all
+$\beta\ge\beta_0$ (non-uniqueness, Definition~3.24), and
+$\beta_c(2)\le\beta_0<\infty$. One may take $\beta_0=1$.
+\end{theorem}
+
+The proof occupies the rest of the document: contours are constructed in
+Section~\ref{sec:contours}, Peierls' estimate (Lemma~3.37 of the
+transcription) is proved in Section~\ref{sec:peierls}, an entropy bound
+(replacing Lemma~3.38 there by a simpler walk count, sufficient for our
+purposes) in Section~\ref{sec:counting}, and the conclusion is drawn
+in Section~\ref{sec:conclusion}.
+
+\section{Contours}
+\label{sec:contours}
+
+Throughout this section $n$ is fixed and $\omega$ denotes a configuration in
+$\Omega^{+}_{B(n)}$. We construct the contour representation of $\omega$
+underlying \S3.7.2 of the transcription, and we establish the geometric and
+combinatorial lemmas used in
+Sections~\ref{sec:peierls}--\ref{sec:conclusion}. Everything is elementary;
+the only two facts we use without proof are the Jordan curve theorem for
+polygonal curves and its standard crossing-parity refinement, both flagged
+explicitly below.
+
+\subsection{The dual lattice and disagreement edges}
+
+The \emph{dual lattice} is
+\[
+  \dualZ \;=\; \Z^2+\big(\tfrac12,\tfrac12\big)
+  \;=\;\big\{\,(a+\tfrac12,\,b+\tfrac12) : a,b\in\Z \,\big\},
+\]
+whose vertices are the centres of the unit faces (plaquettes) of $\Z^2$; its
+edges are the unit segments joining dual vertices at Euclidean distance $1$,
+so that each dual vertex has exactly four incident dual edges. Every
+nearest-neighbour edge $e=\{i,j\}\in\Eset_{\Z^2}$ determines a unique
+\emph{dual edge} $e^*$, namely the edge of $\dualZ$ crossing $e$
+perpendicularly at its midpoint:
+\begin{align*}
+  \{(a,b),(a+1,b)\}^*&=\big\{(a+\tfrac12,b-\tfrac12),\,(a+\tfrac12,b+\tfrac12)\big\},\\
+  \{(a,b),(a,b+1)\}^*&=\big\{(a-\tfrac12,b+\tfrac12),\,(a+\tfrac12,b+\tfrac12)\big\},
+\end{align*}
+and $e\mapsto e^*$ is a bijection from $\Eset_{\Z^2}$ onto the set of edges
+of $\dualZ$. Given $\omega\in\Omega^{+}_{B(n)}$, define the set of
+\emph{disagreement edges}
+\[
+  \dedges(\omega)
+  \;=\;\big\{\, e^* \;:\; e=\{i,j\}\in\Eset_{\Z^2},\
+        \sg_i(\omega)\sg_j(\omega)=-1 \,\big\}.
+\]
+This set is finite: a disagreeing pair $\{i,j\}$ has at least one endpoint
+with spin $-1$, hence in $B(n)$ (spins outside $B(n)$ are $+1$), and each
+site of $B(n)$ has four incident edges, so
+$|\dedges(\omega)|\le 4|B(n)|<\infty$.
+
+The construction of contours rests on the following parity property.
+
+\begin{lemma}[even-degree property]
+For every $\omega\in\Omega^{+}_{B(n)}$ and every dual vertex $x^*\in\dualZ$,
+the number of edges of $\dedges(\omega)$ incident to $x^*$ is $0$, $2$
+or~$4$.
+\end{lemma}
+
+\begin{proof}
+Write $x^*=(a+\tfrac12,b+\tfrac12)$ and let $i_1=(a,b)$, $i_2=(a+1,b)$,
+$i_3=(a+1,b+1)$, $i_4=(a,b+1)$ be the four corners of the plaquette centred
+at $x^*$. From the explicit description of dual edges above, the four edges
+of $\dualZ$ incident to $x^*$ are precisely the duals of the four plaquette
+edges $\{i_1,i_2\}$, $\{i_2,i_3\}$, $\{i_3,i_4\}$, $\{i_4,i_1\}$. With
+indices taken mod $4$,
+\[
+  \prod_{m=1}^{4}\sg_{i_m}(\omega)\,\sg_{i_{m+1}}(\omega)
+  \;=\;\prod_{m=1}^{4}\sg_{i_m}(\omega)^2\;=\;+1,
+\]
+since every spin occurs in exactly two factors. Each factor equals $\pm1$,
+so the number of indices $m$ with $\sg_{i_m}\sg_{i_{m+1}}=-1$ --- which is
+the degree of $x^*$ in $\dedges(\omega)$ --- is even.
+\end{proof}
+
+\subsection{The deformation rule and the contour decomposition}
+
+For a dual vertex $x^*$, call the four incident dual edges its \emph{north},
+\emph{east}, \emph{south} and \emph{west} edges (joining $x^*$ to
+$x^*+(0,1)$, $x^*+(1,0)$, $x^*-(0,1)$, $x^*-(1,0)$ respectively).
+
+\medskip\noindent\textbf{Deformation rule.}
+At every dual vertex $x^*$ incident to at least one edge of
+$\dedges(\omega)$, partition the incident edges of $\dedges(\omega)$ into
+pairs as follows (this is possible by the even-degree property just proved):
+\begin{itemize}
+  \item if exactly two edges of $\dedges(\omega)$ are incident to $x^*$,
+        pair them with each other;
+  \item if all four edges incident to $x^*$ belong to $\dedges(\omega)$,
+        pair the north edge with the east edge, and the south edge with the
+        west edge.
+\end{itemize}
+Each pair at $x^*$ is thought of as a \emph{passage} of a curve through
+$x^*$: a \emph{corner} if the two edges are perpendicular, \emph{straight}
+if they are collinear. At a vertex of degree $4$ the rule produces two
+corners (the north--east and the south--west corner) which do not cross each
+other; the symmetric convention (north--west with south--east) would serve
+equally well, whereas pairing north with south and east with west is
+excluded, as it would produce two straight passages crossing at $x^*$.
+Nothing below depends on which of the two admissible conventions is fixed;
+we fix the north--east/south--west one once and for all.
+
+\begin{lemma}\label{lem:contour-decomp}
+Let $\omega\in\Omega^{+}_{B(n)}$ with $\dedges(\omega)\neq\varnothing$.
+There is a unique partition
+\[
+  \dedges(\omega)\;=\;\gamma_1^*\sqcup\cdots\sqcup\gamma_k^*
+\]
+such that each $\gamma_m^*$ is the edge set of a closed circuit of $\dualZ$
+which traverses every edge of $\gamma_m^*$ exactly once
+(edge-self-avoiding) and which moves through each visited dual vertex along
+a pair prescribed by the deformation rule (i.e.\ any two consecutive edges
+of the circuit are paired at their common endpoint). Moreover, every
+$|\gamma_m^*|$ is even and $\ge 4$.
+\end{lemma}
+
+\begin{proof}
+For $e^*\in\dedges(\omega)$ and an endpoint $x^*$ of $e^*$, the deformation
+rule assigns to $e^*$ a unique \emph{partner} at $x^*$: the edge paired with
+$e^*$ among the edges of $\dedges(\omega)$ incident to $x^*$. The partner
+relation at $x^*$ is a fixed-point-free involution of those edges. Let $L$
+be the graph with vertex set $\dedges(\omega)$ in which $e^*$ and $f^*$ are
+adjacent when they are partners at a common endpoint.
+
+Each $e^*$ has exactly one partner at each of its two endpoints, so exactly
+two partnership links, attached at \emph{distinct} endpoints of $e^*$.
+The two partners are moreover distinct edges: if $f^*$ were the partner of
+$e^*$ at both endpoints of $e^*$, then $f^*\neq e^*$ would be a dual edge
+with the same two endpoints as $e^*$, impossible since $\dualZ$ has no
+multiple edges. Hence $L$ is $2$-regular, with no loops and no double
+adjacencies, and is therefore a disjoint union of cycles
+$(e_1^*,e_2^*,\dots,e_r^*)$ with $r\ge3$, consecutive elements (cyclically)
+being partners at a common endpoint.
+
+Fix such a cycle and let $x_m^*$ denote the common endpoint at which
+$e_m^*$ and $e_{m+1}^*$ are partners (indices mod $r$). Since the two links
+of $e_m^*$ are attached at its two distinct endpoints, the endpoints of
+$e_m^*$ are exactly $x_{m-1}^*$ and $x_m^*$. Thus
+$x_0^*,x_1^*,\dots,x_{r-1}^*,x_0^*$ is a closed walk in $\dualZ$ which
+traverses $e_1^*,\dots,e_r^*$, each exactly once, and which moves through
+every visited vertex along a prescribed pair. The edge sets of the cycles
+of $L$ therefore partition $\dedges(\omega)$ into circuits as in the
+statement.
+
+\emph{Uniqueness.} In any partition as in the statement, when a circuit
+traverses an edge $e^*$, the preceding edge is the partner of $e^*$ at the
+entry endpoint and the following edge is the partner at the exit endpoint;
+hence the edge set of each circuit is closed under taking partners, and it
+is $L$-connected (consecutive edges are $L$-adjacent). A nonempty
+$L$-connected set closed under $L$-adjacency is the vertex set of one cycle
+of $L$, so the partition coincides with the one just constructed.
+
+\emph{Parity and length.} The dual lattice is bipartite: colour
+$(a+\tfrac12,b+\tfrac12)$ by the parity of $a+b$; every step of a walk in
+$\dualZ$ changes the colour, so every closed walk has even length. Hence
+$r$ is even, and since $r\ge3$ we get $r\ge4$.
+\end{proof}
+
+\subsection{Contours as simple closed curves}
+
+Let $\gamma^*$ be one of the circuits produced by
+Lemma~\ref{lem:contour-decomp}. We realize it as a closed curve
+$\widehat\gamma\subset\R^2$ as follows. Start from the union of the (closed)
+dual edges of $\gamma^*$. At every passage of the circuit through a dual
+vertex $x^*$ along two \emph{perpendicular} edges (a corner), delete from
+those two edges the half-open segments of length $\tfrac14$ abutting $x^*$
+(each containing $x^*$ but not the point at distance $\tfrac14$ from it)
+and insert instead the straight chord joining the two surviving endpoints,
+i.e.\ the two points at distance $\tfrac14$ from $x^*$ on the two edges
+(``rounding the corner''). Straight passages are left untouched. Each chord
+lies within distance $\tfrac14$ of its vertex $x^*$, inside the closed
+quadrant at $x^*$ spanned by the directions of the two paired edges, and
+avoids the point $x^*$ itself.
+
+We claim that $\widehat\gamma$ is a \emph{simple} closed curve and that the
+curves realizing distinct contours of the same configuration are pairwise
+disjoint. Distinct dual edges are disjoint except possibly for a common
+endpoint, and a chord at $x^*$ is disjoint from every dual edge not
+containing $x^*$ (such an edge is at distance $\ge\tfrac12$ from $x^*$), so
+it suffices to examine small neighbourhoods of the dual vertices. At a
+vertex of degree $2$ in $\dedges(\omega)$ there is a single passage (of a
+single contour) and nothing to check. At a vertex $x^*$ of degree $4$, all
+four incident edges are trimmed and the two passages are the north--east
+and the south--west corners; the two chords lie in the closed north-east,
+respectively south-west, quadrant at $x^*$ and avoid $x^*$, so they are
+disjoint from each other, and each meets the trimmed edges only at its two
+endpoints, where the curve is glued. Hence no two passages intersect,
+whether they belong to the same contour or to different ones, and the
+claim follows.
+
+By the Jordan curve theorem for piecewise-linear curves --- an elementary
+classical result that we use without proof ---
+$\R^2\setminus\widehat\gamma$ has exactly two connected components, one
+bounded and one unbounded, each with boundary $\widehat\gamma$. This
+theorem, together with the crossing-parity fact quoted in the proof of
+Lemma~\ref{lem:edge-boundary} below, is the only topological input of this
+section; both are standard, and they are the only statements below that are
+sketched rather than proved in detail.
+
+Note also that no site of $\Z^2$ lies on any realized curve: a site is at
+distance $\tfrac12$ from every dual edge and at distance $\tfrac{\sqrt2}2$
+from every dual vertex, hence at distance at least
+$\tfrac{\sqrt2}2-\tfrac14>0$ from every chord. Thus every site of $\Z^2$
+lies either in the bounded or in the unbounded component of
+$\R^2\setminus\widehat\gamma$.
+
+Finally, observe that the circuit structure, hence the curve
+$\widehat\gamma$, is determined by the \emph{edge set} $\gamma^*$ alone,
+independently of the ambient configuration: at every dual vertex, $\gamma^*$
+contains either both edges of a single passage or all four incident edges
+(if $e^*\in\gamma^*$ then so is its partner at each endpoint), and applying
+the deformation rule to $\gamma^*$ itself reproduces the pairing inherited
+from $\dedges(\omega)$. This makes the following definition unambiguous.
+
+\begin{definition}\label{def:contours}
+Let $\omega\in\Omega^{+}_{B(n)}$. The edge sets
+$\gamma_1^*,\dots,\gamma_k^*$ of the unique decomposition of
+$\dedges(\omega)$ given by Lemma~\ref{lem:contour-decomp} are called the
+\emph{contours} of $\omega$, and we set
+$\Gam(\omega)=\{\gamma_1^*,\dots,\gamma_k^*\}$ (with
+$\Gam(\omega)=\varnothing$ when $\dedges(\omega)=\varnothing$). For a
+contour $\gamma^*$, realized as the simple closed curve $\widehat\gamma$:
+\begin{itemize}
+  \item $|\gamma^*|$ denotes the number of dual edges of $\gamma^*$ (its
+        \emph{length});
+  \item $\Intr(\gamma^*)$ is the set of sites of $\Z^2$ lying in the
+        bounded component of $\R^2\setminus\widehat\gamma$, and
+        $\Extr(\gamma^*)$ the set of sites lying in the unbounded
+        component, so that
+        $\Z^2=\Intr(\gamma^*)\sqcup\Extr(\gamma^*)$; we say that $\gamma^*$
+        \emph{surrounds} $i$ if $i\in\Intr(\gamma^*)$.
+\end{itemize}
+More generally, a set $\gamma^*$ of dual edges is called a \emph{contour in
+$B(n)$} if $\gamma^*\in\Gam(\omega')$ for at least one
+$\omega'\in\Omega^{+}_{B(n)}$, and for such $\gamma^*$ we write
+\[
+  \{\Gam\ni\gamma^*\}
+  \;=\;\big\{\omega\in\Omega^{+}_{B(n)} : \gamma^*\in\Gam(\omega)\big\}
+\]
+for the event that $\gamma^*$ belongs to the contour family of the
+configuration.
+\end{definition}
+
+\subsection{Three geometric lemmas}
+
+The first lemma is the discrete Jordan-type fact on which everything else
+rests: the dual edges of a contour are exactly the dual bonds separating its
+interior from its exterior.
+
+\begin{lemma}\label{lem:edge-boundary}
+Let $\gamma^*$ be a contour in $B(n)$. Then:
+\begin{enumerate}
+  \item[(a)] for every nearest-neighbour edge $e=\{i,j\}\in\Eset_{\Z^2}$,
+  \[
+    e^*\in\gamma^*
+    \quad\Longleftrightarrow\quad
+    \text{exactly one of $i,j$ belongs to $\Intr(\gamma^*)$;}
+  \]
+  \item[(b)] $\Intr(\gamma^*)\subseteq B(n)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(a) We use the following standard consequence of the Jordan curve theorem
+(\emph{crossing parity}), which --- as announced --- we only sketch. Let
+$p,q\in\R^2\setminus\widehat\gamma$ and suppose the segment $[p,q]$ meets
+$\widehat\gamma$ in finitely many points, at each of which $\widehat\gamma$
+is locally a straight segment crossed transversally by $[p,q]$. Then $p$ and
+$q$ lie in the same component of $\R^2\setminus\widehat\gamma$ if and only
+if the number of intersection points is even. \emph{Sketch:} on each maximal
+subinterval of $[p,q]\setminus\widehat\gamma$ the ambient component is
+constant; at a transversal crossing the segment passes from one local side
+of the curve to the other; and for a simple closed curve the two local sides
+of the curve near any of its points lie in the two distinct global
+components. This last assertion is the standard refinement of the Jordan
+curve theorem for polygonal curves, and is the step we do not prove.
+
+Now fix $e=\{i,j\}$; by symmetry (the construction is invariant under the
+lattice symmetries exchanging the axes) we may assume $e$ horizontal,
+$i=(a,b)$, $j=(a+1,b)$. We count the points of $[i,j]\cap\widehat\gamma$:
+\begin{itemize}
+  \item every point of $[i,j]$ has second coordinate $b\in\Z$, while dual
+        vertices have both coordinates in $\Z+\tfrac12$; hence $[i,j]$ is at
+        distance $\ge\tfrac12$ from every dual vertex, and in particular
+        avoids all chords (which lie within distance $\tfrac14$ of their
+        vertices);
+  \item a horizontal dual edge lies on a line $\{y=d+\tfrac12\}$, $d\in\Z$,
+        hence is disjoint from $[i,j]$;
+  \item a vertical dual edge
+        $f^*=\{(c+\tfrac12,d+\tfrac12),(c+\tfrac12,d+\tfrac32)\}$ meets the
+        line $\{y=b\}$ if and only if $b=d+1$, and then in the single point
+        $(c+\tfrac12,b)$, which belongs to $[i,j]$ if and only if $c=a$.
+        Thus the only dual edge meeting $[i,j]$ is $e^*$ itself, at its
+        midpoint (which is also the midpoint of $e$);
+  \item the midpoint of $e^*$ is at distance $\tfrac12$ from both endpoints
+        of $e^*$, so it survives the trimming (which removes only points
+        within distance $\tfrac14$ of dual vertices); near it,
+        $\widehat\gamma$ coincides with the vertical segment $e^*$, which
+        $[i,j]$ crosses transversally.
+\end{itemize}
+Hence $[i,j]$ meets $\widehat\gamma$ in exactly one point, a transversal
+crossing, if $e^*\in\gamma^*$, and in no point otherwise. Since neither
+$i$ nor $j$ lies on $\widehat\gamma$, the crossing-parity fact shows that
+$i$ and $j$ lie in different components of $\R^2\setminus\widehat\gamma$ if
+and only if $e^*\in\gamma^*$; and lying in different components means
+precisely that exactly one of $i,j$ lies in the bounded component, i.e.\ in
+$\Intr(\gamma^*)$.
+
+(b) Let $K=[-n-\tfrac12,\,n+\tfrac12]^2$ and let
+$\omega'\in\Omega^{+}_{B(n)}$ be a configuration with
+$\gamma^*\in\Gam(\omega')$. Every $e^*\in\gamma^*\subseteq\dedges(\omega')$
+is dual to a disagreement edge $e=\{i,j\}$, which has an endpoint of spin
+$-1$, necessarily in $B(n)$; say $i\in B(n)$. In the direction of $e$, all
+points of $e^*$ have the same coordinate, equal to the average of the
+corresponding coordinates of $i$ and $j$; since the coordinate of $i$ lies
+in $[-n,n]$ and that of $j$ differs from it by $1$, this average lies in
+$[-n-\tfrac12,\,n+\tfrac12]$. In the perpendicular direction, the
+coordinates of the points of $e^*$ range over $[c-\tfrac12,\,c+\tfrac12]$,
+where $c\in[-n,n]$ is the common perpendicular coordinate of $i$ and $j$.
+Hence $e^*\subseteq K$. Every chord of $\widehat\gamma$ is a straight
+segment with both endpoints on dual edges of $\gamma^*$, hence in $K$, and
+$K$ is convex; therefore $\widehat\gamma\subseteq K$. The set
+$\R^2\setminus K$ is connected, unbounded and disjoint from
+$\widehat\gamma$, so it is contained in a single component of
+$\R^2\setminus\widehat\gamma$, necessarily the unbounded one. Consequently
+the bounded component is contained in $K$, and
+\[
+  \Intr(\gamma^*)\;\subseteq\;K\cap\Z^2\;=\;\{-n,\dots,n\}^2\;=\;B(n).
+  \qedhere
+\]
+\end{proof}
+
+\begin{lemma}\label{lem:surround}
+Let $\omega\in\Omega^{+}_{B(n)}$. If $\sg_0(\omega)=-1$, then there exists
+$\gamma^*\in\Gam(\omega)$ with $0\in\Intr(\gamma^*)$.
+\end{lemma}
+
+\begin{proof}
+For $i\in\Z^2$, let
+\[
+  N(i)\;=\;\#\big\{\gamma^*\in\Gam(\omega) : i\in\Intr(\gamma^*)\big\}.
+\]
+We prove the stronger identity
+\[
+  \sg_i(\omega)\;=\;(-1)^{N(i)}
+  \qquad\text{for every } i\in\Z^2,
+\]
+which immediately yields the lemma: $\sg_0(\omega)=-1$ forces $N(0)$ to be
+odd, in particular $N(0)\ge1$, so some contour of $\omega$ surrounds $0$.
+
+Set $g(i)=\sg_i(\omega)\,(-1)^{N(i)}\in\{-1,+1\}$ and let
+$\{i,j\}\in\Eset_{\Z^2}$ be arbitrary. For each contour
+$\gamma^*\in\Gam(\omega)$, Lemma~\ref{lem:edge-boundary}(a) states that the
+indicators $\mathbf 1_{\Intr(\gamma^*)}(i)$ and
+$\mathbf 1_{\Intr(\gamma^*)}(j)$ differ if and only if
+$\{i,j\}^*\in\gamma^*$, i.e.
+\[
+  \mathbf 1_{\Intr(\gamma^*)}(i)-\mathbf 1_{\Intr(\gamma^*)}(j)
+  \;\equiv\;
+  \mathbf 1\big\{\{i,j\}^*\in\gamma^*\big\}
+  \pmod 2 .
+\]
+Summing over $\gamma^*\in\Gam(\omega)$, and using that the contours
+partition $\dedges(\omega)$ (Lemma~\ref{lem:contour-decomp}), so that
+$\{i,j\}^*$ belongs to exactly one contour if
+$\{i,j\}^*\in\dedges(\omega)$ and to none otherwise, we obtain
+\[
+  N(i)-N(j)\;\equiv\;\mathbf 1\big\{\{i,j\}^*\in\dedges(\omega)\big\}
+  \pmod 2 .
+\]
+On the other hand, by the definition of $\dedges(\omega)$,
+\[
+  \sg_i(\omega)\,\sg_j(\omega)
+  \;=\;(-1)^{\mathbf 1\{\{i,j\}^*\in\dedges(\omega)\}} .
+\]
+Combining the two displays (and $N(i)+N(j)\equiv N(i)-N(j)\bmod 2$),
+\[
+  g(i)\,g(j)
+  \;=\;\sg_i\sg_j\,(-1)^{N(i)+N(j)}
+  \;=\;(-1)^{\mathbf 1\{\{i,j\}^*\in\dedges(\omega)\}}\,
+       (-1)^{\mathbf 1\{\{i,j\}^*\in\dedges(\omega)\}}
+  \;=\;+1 ,
+\]
+so $g(i)=g(j)$ for every nearest-neighbour pair: since $\Z^2$ is connected
+under nearest-neighbour adjacency, $g$ is constant. Finally, pick any
+$i\notin B(n)$: then $\sg_i(\omega)=+1$, and $N(i)=0$ because
+$\Intr(\gamma^*)\subseteq B(n)$ for every contour
+(Lemma~\ref{lem:edge-boundary}(b)). Hence $g\equiv+1$, which is the claimed
+identity.
+\end{proof}
+
+\begin{lemma}\label{lem:cross}
+Let $\gamma^*$ be a contour in $B(n)$ with $0\in\Intr(\gamma^*)$ and
+$|\gamma^*|=\ell$. Then $\gamma^*$ contains a dual edge of the form
+\[
+  \big\{(k+\tfrac12,-\tfrac12),\,(k+\tfrac12,\tfrac12)\big\}
+  \;=\;\big\{(k,0),(k+1,0)\big\}^*
+  \qquad\text{for some integer } 0\le k\le \tfrac{\ell}{2}-1 .
+\]
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{lem:edge-boundary}(b), $\Intr(\gamma^*)\subseteq B(n)$ is
+finite, while it contains $0$ by hypothesis. Hence
+\[
+  k=\max\{m\ge0 : (m,0)\in\Intr(\gamma^*)\}
+  \qquad\text{and}\qquad
+  k'=\max\{m\ge0 : (-m,0)\in\Intr(\gamma^*)\}
+\]
+are well defined, and $k,k'\ge0$. The edge $\{(k,0),(k+1,0)\}$ has exactly
+one endpoint in $\Intr(\gamma^*)$, so by Lemma~\ref{lem:edge-boundary}(a)
+its dual edge $\{(k+\tfrac12,-\tfrac12),(k+\tfrac12,\tfrac12)\}$ belongs to
+$\gamma^*$; likewise
+$\{(-k'-\tfrac12,-\tfrac12),(-k'-\tfrac12,\tfrac12)\}
+=\{(-k'-1,0),(-k',0)\}^*\in\gamma^*$.
+
+It remains to bound $k$. Regard $\gamma^*$ as a closed circuit
+$x_0^*,x_1^*,\dots,x_\ell^*=x_0^*$ in $\dualZ$
+(Lemma~\ref{lem:contour-decomp}). The dual vertices
+$u^*=(k+\tfrac12,\tfrac12)$ and $v^*=(-k'-\tfrac12,\tfrac12)$ are endpoints
+of edges of $\gamma^*$, hence are visited by the circuit, and $u^*\neq v^*$
+since their first coordinates satisfy $k+\tfrac12\ge\tfrac12$ and
+$-k'-\tfrac12\le-\tfrac12$. The circuit therefore splits at $u^*$ and $v^*$
+into two walks from $u^*$ to $v^*$, of lengths $\ell_1,\ell_2$ with
+$\ell_1+\ell_2=\ell$. Every step of a walk in $\dualZ$ changes the first
+coordinate by at most $1$, so each of the two walks has at least
+\[
+  \big|(k+\tfrac12)-(-k'-\tfrac12)\big| \;=\; k+k'+1 \;\ge\; k+1
+\]
+steps. Hence $\ell=\ell_1+\ell_2\ge 2(k+1)$, that is,
+$k\le\tfrac{\ell}{2}-1$.
+\end{proof}
+
+\begin{remark}\label{rem:bijection}
+The identity $\sg_i(\omega)=(-1)^{N(i)}$ established in the proof of
+Lemma~\ref{lem:surround} shows that a configuration
+$\omega\in\Omega^{+}_{B(n)}$ is reconstructible from its contour family, so
+the map $\omega\mapsto\Gam(\omega)$ is \emph{injective}. With the
+appropriate notion of admissibility (finite families of contours in $B(n)$
+with pairwise disjoint edge sets whose union again satisfies the
+even-degree property, with the deformation rule reproducing each member),
+the map is in fact a \emph{bijection} onto the set of admissible families of
+pairwise compatible contours: reading the identity backwards produces, from
+any such family, the unique configuration admitting it as its contour
+family. We will not need this surjectivity statement: the Peierls argument
+in Sections~\ref{sec:peierls}--\ref{sec:conclusion} only uses the events
+$\{\Gam\ni\gamma^*\}$ together with Lemmas~\ref{lem:surround}
+and~\ref{lem:cross}, so we omit the (easy) proof.
+\end{remark}
+
+\section{Peierls' estimate}
+\label{sec:peierls}
+
+\begin{lemma}[Peierls' estimate; Lemma 3.37, eq.~(3.34) of the transcription]
+\label{lem:peierls}
+For all $\beta>0$, all $n$, and any contour $\gamma^*$,
+\[
+  \mu^{+}_{B(n);\beta,0}(\Gam\ni\gamma^*)\le e^{-2\beta|\gamma^*|}.
+\]
+\end{lemma}
+
+\noindent
+The proof follows the classical energy argument: erasing the contour
+$\gamma^*$ from a configuration lowers the energy by exactly
+$2\beta|\gamma^*|$, and the erasure map is injective, so the constrained
+partition sum is exponentially small compared with the full one. We mark the
+steps explicitly; everything rests on
+Lemmas~\ref{lem:edge-boundary} and~\ref{lem:contour-decomp}.
+
+\begin{proof}
+Fix $n$, $\beta>0$ and a contour $\gamma^*$. Throughout, write
+$\mu^{+}=\mu^{+}_{B(n);\beta,0}$, $\Ham=\Ham^{+}_{B(n);\beta,0}$,
+$Z=Z^{+}_{B(n);\beta,0}$, and let
+\[
+  \Eset_{B(n)}
+  =\bigl\{\{i,j\}\in\Eset_{\Z^2} : \{i,j\}\cap B(n)\neq\varnothing\bigr\}
+\]
+denote the (finite) set of edges appearing in the Hamiltonian of
+Section~\ref{sec:setting}.
+
+\medskip\noindent\emph{Step 1: the erasure map.}
+Define $T_{\gamma^*}:\Omega^{+}_{B(n)}\to\{-1,1\}^{\Z^2}$ by
+\[
+  (T_{\gamma^*}\omega)_i=
+  \begin{cases}
+    -\omega_i & \text{if } i\in\Intr(\gamma^*),\\
+    \ \ \omega_i & \text{otherwise.}
+  \end{cases}
+\]
+By Lemma~\ref{lem:edge-boundary}(b), $\Intr(\gamma^*)\subseteq B(n)$, so
+$T_{\gamma^*}$ does not modify any spin outside $B(n)$; hence
+$T_{\gamma^*}\omega\in\Omega^{+}_{B(n)}$, i.e.\ $T_{\gamma^*}$ maps
+$\Omega^{+}_{B(n)}$ into itself. Moreover $T_{\gamma^*}\circ T_{\gamma^*}$ is
+the identity, so $T_{\gamma^*}$ is an involution of $\Omega^{+}_{B(n)}$; in
+particular it is injective, and a fortiori injective when restricted to the
+event $\{\Gam\ni\gamma^*\}=\{\omega:\gamma^*\in\Gam(\omega)\}$.
+
+\medskip\noindent\emph{Step 2: the energy identity.}
+We claim that for every $\omega\in\Omega^{+}_{B(n)}$ with
+$\gamma^*\in\Gam(\omega)$,
+\begin{equation}
+  \label{eq:energy-drop}
+  \Ham(T_{\gamma^*}\omega)=\Ham(\omega)-2\beta|\gamma^*| .
+\end{equation}
+Both sides are finite sums over the same edge set $\Eset_{B(n)}$, so it
+suffices to compare the two Hamiltonians edge by edge. Fix
+$\{i,j\}\in\Eset_{\Z^2}$ and consider the product
+$\sg_i\sg_j$. Since $T_{\gamma^*}$ flips precisely the spins in
+$\Intr(\gamma^*)$,
+\[
+  \sg_i(T_{\gamma^*}\omega)\,\sg_j(T_{\gamma^*}\omega)
+  =-\,\sg_i(\omega)\,\sg_j(\omega)
+  \quad\Longleftrightarrow\quad
+  \text{exactly one of } i,j \text{ lies in } \Intr(\gamma^*),
+\]
+and the product is unchanged when both or neither endpoint lies in
+$\Intr(\gamma^*)$. By Lemma~\ref{lem:edge-boundary}(a), the edges with
+exactly one endpoint in $\Intr(\gamma^*)$ are exactly the $|\gamma^*|$ edges
+of $\Eset_{\Z^2}$ whose dual edge belongs to $\gamma^*$.
+
+Now use the hypothesis $\gamma^*\in\Gam(\omega)$. By
+Lemma~\ref{lem:contour-decomp}, the edges of $\gamma^*$ all belong to
+$\dedges(\omega)$; that is, each edge $\{i,j\}$ dual to an edge of $\gamma^*$
+is a disagreement edge of $\omega$:
+$\sg_i(\omega)\sg_j(\omega)=-1$. Two consequences:
+\begin{enumerate}
+\item Every such $\{i,j\}$ lies in $\Eset_{B(n)}$, and so genuinely appears
+  in the Hamiltonian. Indeed, if both endpoints lay outside $B(n)$, then
+  $\omega\in\Omega^{+}_{B(n)}$ would force
+  $\sg_i(\omega)=\sg_j(\omega)=+1$ and the edge could not be a disagreement
+  edge. (Alternatively: by Lemma~\ref{lem:edge-boundary} one endpoint lies in
+  $\Intr(\gamma^*)\subseteq B(n)$.)
+\item With the sign convention
+  $\Ham(\omega)=-\beta\sum_{\{i,j\}\in\Eset_{B(n)}}\sg_i(\omega)\sg_j(\omega)$,
+  each such edge contributes $-\beta\cdot(-1)=+\beta$ to $\Ham(\omega)$,
+  while after the flip it satisfies
+  $\sg_i(T_{\gamma^*}\omega)\sg_j(T_{\gamma^*}\omega)=+1$ and contributes
+  $-\beta$ to $\Ham(T_{\gamma^*}\omega)$: a decrease of $2\beta$ per edge of
+  $\gamma^*$.
+\end{enumerate}
+All remaining edges of $\Eset_{B(n)}$ have zero or two endpoints in
+$\Intr(\gamma^*)$ and contribute equally to $\Ham(\omega)$ and to
+$\Ham(T_{\gamma^*}\omega)$. Summing over $\Eset_{B(n)}$ yields
+\eqref{eq:energy-drop}: erasing the contour lowers the energy by exactly
+$2\beta|\gamma^*|$.
+
+\medskip\noindent\emph{Step 3: conclusion.}
+Exponentiating \eqref{eq:energy-drop}, for every $\omega$ with
+$\gamma^*\in\Gam(\omega)$ we have
+$e^{-\Ham(\omega)}=e^{-2\beta|\gamma^*|}\,e^{-\Ham(T_{\gamma^*}\omega)}$.
+Therefore
+\[
+  \mu^{+}(\Gam\ni\gamma^*)
+  =\frac{1}{Z}\sum_{\substack{\omega\in\Omega^{+}_{B(n)}:\\ \Gam(\omega)\ni\gamma^*}}
+     e^{-\Ham(\omega)}
+  =e^{-2\beta|\gamma^*|}\,
+   \frac{1}{Z}\sum_{\substack{\omega\in\Omega^{+}_{B(n)}:\\ \Gam(\omega)\ni\gamma^*}}
+     e^{-\Ham(T_{\gamma^*}\omega)} .
+\]
+Since $T_{\gamma^*}$ is injective on $\{\Gam\ni\gamma^*\}$ (Step 1), the
+configurations $T_{\gamma^*}\omega$ appearing in the last sum are pairwise
+distinct elements of $\Omega^{+}_{B(n)}$, so the sum of their Boltzmann
+weights is bounded by the full partition function:
+\[
+  \sum_{\substack{\omega\in\Omega^{+}_{B(n)}:\\ \Gam(\omega)\ni\gamma^*}}
+     e^{-\Ham(T_{\gamma^*}\omega)}
+  \;\le\;
+  \sum_{\omega'\in\Omega^{+}_{B(n)}} e^{-\Ham(\omega')}
+  \;=\; Z .
+\]
+Combining the two displays gives
+$\mu^{+}(\Gam\ni\gamma^*)\le e^{-2\beta|\gamma^*|}$, as claimed. Note that
+the bound is uniform in $n$ and holds for every $\beta>0$.
+\end{proof}
+
+\begin{remark}
+As the transcription observes after Lemma~3.37, the estimate expresses the
+\emph{stability of the ground state} $\eta^+\equiv+1$ at large $\beta$: any
+fixed deviation from $\eta^+$, encoded by a contour $\gamma^*$, has
+probability exponentially small in the energy cost $2\beta|\gamma^*|$ of its
+boundary. (Beyond the book, our phrasing:) the argument trades energy against
+entropy --- the exponential decay in $|\gamma^*|$ obtained here will beat, for
+$\beta$ large, the exponential growth in the \emph{number} of contours of a
+given length established in Section~\ref{sec:counting}.
+\end{remark}
+
+\section{Counting contours}
+\label{sec:counting}
+
+The second ingredient of the Peierls argument is an \emph{entropy} bound: an
+upper bound on the number of contours of a given length, first through a fixed
+dual edge, then surrounding the origin. Together with the \emph{energy} bound
+of Lemma~\ref{lem:peierls} it will make the sum over contours convergent and
+small at large $\beta$. Throughout, ``contour'' means a contour in $B(n)$ for
+some (arbitrary) $n$, in the sense of Definition~\ref{def:contours}; the
+bounds below use only the circuit property of
+Lemma~\ref{lem:contour-decomp} and are uniform in $n$.
+
+\begin{lemma}
+\label{lem:walkcount}
+Let $e^*$ be a fixed edge of the dual lattice $\dualZ$ and let $\ell\ge1$.
+The number of contours $\gamma^*$ with $|\gamma^*|=\ell$ and
+$e^*\in\gamma^*$ is at most $3^{\ell-1}$.
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{lem:contour-decomp}, every contour is a closed
+edge-self-avoiding circuit in $\dualZ$. Fix one of the two endpoints of $e^*$
+as starting vertex, i.e.\ fix once and for all a direction in which $e^*$ is
+crossed. Every contour $\gamma^*$ of length $\ell$ containing $e^*$ can then
+be traversed as a closed walk
+\[
+  e^*_1=e^*,\ e^*_2,\ \dots,\ e^*_\ell
+\]
+in $\dualZ$ which starts by crossing $e^*$ in the fixed direction and uses
+each of the $\ell$ edges of $\gamma^*$ exactly once: one starts the
+traversal of the circuit at an occurrence of $e^*$, reversing the circuit's
+orientation if necessary so that $e^*$ is crossed in the fixed direction
+(reversal is legitimate, since the pairing condition of
+Lemma~\ref{lem:contour-decomp} involves unordered pairs of edges). We count
+such walks. The first step
+is the prescribed crossing of $e^*$, so it offers no choice. After
+$k$ steps, $1\le k\le\ell-1$, the walk sits at a dual vertex, which has degree
+$4$ in $\dualZ$; the next edge $e^*_{k+1}$ is one of the $4$ edges incident
+to that vertex, but it cannot be the edge $e^*_k$ just traversed, since
+immediately reversing would use the same edge twice, contradicting
+edge-self-avoidance. Hence each of the $\ell-1$ steps after the first admits
+at most $3$ choices, and there are at most $3^{\ell-1}$ such walks. Since
+every contour of length $\ell$ containing $e^*$ arises (as the set of edges)
+from at least one of these walks, the number of such contours is at most
+$3^{\ell-1}$.
+\end{proof}
+
+\begin{remark}
+\emph{(Our remark, not part of the source text.)} The transcription records
+as Lemma~3.38 the Eulerian-traversal counting idea: a connected graph with
+$N$ edges admits a closed walk using each edge at most twice, which bounds
+the number of admissible edge sets of size $N$ through a fixed edge by an
+exponential in $N$. Because our contours are already closed
+edge-self-avoiding \emph{circuits} (Lemma~\ref{lem:contour-decomp}), the
+simpler one-pass walk count of Lemma~\ref{lem:walkcount} suffices here; it is
+a variant of the same idea, traversing each edge once instead of at most
+twice.
+\end{remark}
+
+\begin{lemma}
+\label{lem:counting}
+For every even $\ell\ge4$, the number of contours $\gamma^*$ with
+$|\gamma^*|=\ell$ and $0\in\Intr(\gamma^*)$ is at most
+$\dfrac{\ell}{2}\,3^{\ell-1}$.
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{lem:cross}, every contour of length $\ell$ surrounding the
+origin contains at least one of the $\ell/2$ vertical dual edges
+\[
+  e^*_k=\big\{(k+\tfrac12,-\tfrac12),\,(k+\tfrac12,\tfrac12)\big\},
+  \qquad k\in\{0,1,\dots,\tfrac{\ell}{2}-1\}.
+\]
+For each fixed $k$, Lemma~\ref{lem:walkcount} bounds the number of contours
+of length $\ell$ containing $e^*_k$ by $3^{\ell-1}$. Summing over the
+$\ell/2$ possible values of $k$ yields the claim.
+\end{proof}
+
+\section{Proof of the main theorem}
+\label{sec:conclusion}
+
+We now assemble the geometric input (Lemmas~\ref{lem:contour-decomp},
+\ref{lem:surround} and \ref{lem:cross}), the energy estimate
+(Lemma~\ref{lem:peierls}) and the entropy estimate
+(Lemma~\ref{lem:counting}) into a proof of the main theorem.
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+We show that the choice $\beta_0=1$ works. Fix $n\ge1$ and $\beta\ge1$, and
+abbreviate $\mu=\mu^{+}_{B(n);\beta,0}$.
+
+\medskip\noindent
+\emph{Step 1: finite-volume bound on $\mu(\sg_0=-1)$, uniformly in $n$.}
+By Lemma~\ref{lem:surround}, if $\sg_0(\omega)=-1$ then some contour of
+$\Gam(\omega)$ surrounds the origin, i.e.
+\[
+  \{\sg_0=-1\}\ \subset
+  \bigcup_{\gamma^*:\,0\in\Intr(\gamma^*)}\{\Gam\ni\gamma^*\},
+\]
+where the union runs over the set of \emph{all} contours surrounding the
+origin --- not merely those appearing in a given configuration. This set is
+countable: by Lemma~\ref{lem:contour-decomp} every contour has even length
+$\ell\ge4$, and by Lemma~\ref{lem:counting} only finitely many contours of
+each length surround the origin. Hence the union bound gives a well-defined
+sum, which we organize by length and estimate by Peierls' estimate
+(Lemma~\ref{lem:peierls}) and Lemma~\ref{lem:counting}:
+\[
+  \mu(\sg_0=-1)
+  \ \le \sum_{\gamma^*:\,0\in\Intr(\gamma^*)}\mu(\Gam\ni\gamma^*)
+  \ \le \sum_{\substack{\ell\ge4\\ \ell\ \mathrm{even}}}
+        \frac{\ell}{2}\,3^{\ell-1}\,e^{-2\beta\ell}.
+\]
+Since $\frac{\ell}{2}\,3^{\ell-1}=\frac{\ell}{6}\,3^{\ell}$, and since
+extending the sum from even $\ell\ge4$ to all integers $\ell\ge4$ only adds
+nonnegative terms, we obtain, with
+\[
+  x=x(\beta)=3e^{-2\beta},
+\]
+the bound
+\[
+  \mu^{+}_{B(n);\beta,0}(\sg_0=-1)\ \le\ \frac16\sum_{\ell\ge4}\ell\,x^{\ell}.
+\]
+The right-hand side does not depend on $n$: the bound is uniform in the
+volume.
+
+\medskip\noindent
+\emph{Step 2: evaluation of the series.} For $0\le x<1$ and any integer
+$N\ge1$, all the series below converge absolutely, and
+\[
+  (1-x)\sum_{\ell\ge N}\ell\,x^{\ell}
+  =\sum_{\ell\ge N}\ell\,x^{\ell}-\sum_{\ell\ge N+1}(\ell-1)\,x^{\ell}
+  =N x^{N}+\sum_{\ell\ge N+1}x^{\ell}
+  =N x^{N}+\frac{x^{N+1}}{1-x},
+\]
+whence
+\[
+  \sum_{\ell\ge N}\ell\,x^{\ell}
+  =\frac{x^{N}\big(N-(N-1)x\big)}{(1-x)^{2}},
+  \qquad\text{in particular}\qquad
+  \sum_{\ell\ge4}\ell\,x^{\ell}=\frac{x^{4}(4-3x)}{(1-x)^{2}}.
+\]
+(As a sanity check at $N=2$, $x=\tfrac12$: the formula gives
+$\tfrac14\cdot\tfrac32\,/\,\tfrac14=\tfrac32=\sum_{\ell\ge2}\ell\,2^{-\ell}$.)
+Combining with Step 1,
+\[
+  \mu^{+}_{B(n);\beta,0}(\sg_0=-1)\ \le\ f\big(x(\beta)\big),
+  \qquad
+  f(x)=\frac{x^{4}(4-3x)}{6(1-x)^{2}}.
+\]
+
+\medskip\noindent
+\emph{Step 3: numerical bound, valid for all $\beta\ge1$.} Since
+$e^{2}>7.38$, we have
+\[
+  x(1)=3e^{-2}<\frac{3}{7.38}<0.41,
+\]
+and $\beta\mapsto x(\beta)=3e^{-2\beta}$ is decreasing, so
+$0<x(\beta)<0.41$ for every $\beta\ge1$. Moreover $f$ is increasing on
+$[0,0.41]$: the numerator $x^{4}(4-3x)=4x^{4}-3x^{5}$ has derivative
+$16x^{3}-15x^{4}=x^{3}(16-15x)>0$ for $0<x\le1$, and $(1-x)^{-2}$ is positive
+and increasing on $[0,1)$. Hence $f(x(\beta))\le f(0.41)$, which we bound by
+elementary inequalities:
+\[
+  (0.41)^{4}=0.02825761<0.0283,\qquad
+  4-3\cdot(0.41)<4,\qquad
+  (1-0.41)^{2}=(0.59)^{2}=0.3481,
+\]
+so that
+\[
+  f(0.41)\ <\ \frac{0.0283\cdot 4}{6\cdot 0.3481}
+          \ =\ \frac{0.1132}{2.0886}\ <\ 0.0542\ <\ \frac14
+\]
+(indeed $0.0542\cdot2.0886=0.11320212>0.1132$). Therefore
+\[
+  \mu^{+}_{B(n);\beta,0}(\sg_0=-1)\ \le\ 0.0542\ <\ \tfrac14
+  \qquad\text{for all } n\ge1 \text{ and all } \beta\ge1 .
+\]
+
+\medskip\noindent
+\emph{Step 4: finite-volume magnetization.} On $\Omega^{+}_{B(n)}$ the spin
+$\sg_0$ takes values in $\{-1,1\}$, and
+$\sg_0=1-2\cdot\mathbf{1}_{\{\sg_0=-1\}}$: both sides equal $1$ when
+$\sg_0=1$ and $-1$ when $\sg_0=-1$. Taking expectations and using Step 3,
+\[
+  \avg{\sg_0}^{+}_{B(n);\beta,0}
+  =1-2\,\mu^{+}_{B(n);\beta,0}(\sg_0=-1)
+  \ \ge\ 1-2\cdot\tfrac14=\tfrac12
+  \qquad\text{for all } n\ge1,\ \beta\ge1 .
+\]
+
+\medskip\noindent
+\emph{Step 5: thermodynamic limit.} By Theorem~3.17 of the transcription, the
+limit
+$\meanp{\sg_0}_{\beta,0}=\lim_{n\to\infty}\avg{\sg_0}^{+}_{B(n);\beta,0}$
+exists (and is independent of the sequence of volumes). Since each term of
+the sequence is at least $\tfrac12$, so is the limit: in the notation of
+Definition~3.32 of the transcription,
+\[
+  m^*(\beta)=\meanp{\sg_0}_{\beta,0}\ \ge\ \tfrac12\ >\ 0
+  \qquad\text{for every }\beta\ge1 .
+\]
+
+\medskip\noindent
+\emph{Step 6: non-uniqueness and $\beta_c(2)<\infty$.} By Proposition~3.29 of
+the transcription, $\meanm{\sg_0}_{\beta,0}=-\meanp{\sg_0}_{\beta,0}$, so for
+every $\beta\ge1$
+\[
+  \meanm{\sg_0}_{\beta,0}\le-\tfrac12<\tfrac12\le\meanp{\sg_0}_{\beta,0}.
+\]
+Thus $\meanp{\cdot}_{\beta,0}$ and $\meanm{\cdot}_{\beta,0}$ are two
+\emph{distinct} Gibbs states: this is non-uniqueness in the sense of
+Definition~3.24 of the transcription (equivalently, via the one-point
+criterion of Theorem~3.28(3), since
+$\meanp{\sg_0}_{\beta,0}\neq\meanm{\sg_0}_{\beta,0}$). Finally, since
+$m^*(\beta)>0$ for every $\beta\ge1$, Definition~3.32 gives
+\[
+  \beta_c(2)=\sup\{\beta\ge0:m^*(\beta)=0\}\ \le\ 1\ =\ \beta_0\ <\ \infty .
+\]
+This proves all assertions of Theorem~\ref{thm:main} with $\beta_0=1$.
+\end{proof}
+
+\begin{remark}
+\label{rem:d3}
+\emph{(Our remark; sketch only, beyond what is proved in this document.)}
+The same conclusion extends to all dimensions $d\ge3$, with the bound
+$\beta_c(d)\le\beta_c(2)<\infty$. Indeed, by a standard consequence of the
+GKS inequalities (Theorem~3.20 of the transcription), at $h=0$ the expectations
+$\meanp{\sg_A}$ are nondecreasing functions of the coupling constants
+$J\ge0$. Embedding $\Z^d$ into $\Z^{d+1}$ as a coordinate hyperplane and
+setting to zero the couplings on all edges leaving that hyperplane reduces
+the $(d+1)$-dimensional model to the $d$-dimensional one; restoring those
+couplings to their ferromagnetic value can, by GKS monotonicity, only
+increase $\meanp{\sg_0}$. Hence $m^*_{d+1}(\beta)\ge m^*_{d}(\beta)$ for all
+$\beta\ge0$, and $\beta_c(d+1)\le\beta_c(d)$. We do not carry out the details
+here; the statement is consistent with the transcription's claim
+(\S3.7.2 there) that $\beta_c(d)<\infty$ for all $d\ge2$.
+\end{remark}
+
+\begin{remark}
+\label{rem:explicit}
+\emph{(Our remark; the cited improvements are not proved in this document.)}
+The value $\beta_0=1$ obtained above is far from optimal. A more careful
+version of the contour counting --- recorded as Exercise~3.21 in the book,
+according to the transcription (\S3.7.2 there) --- improves the conclusion to
+the explicit bound $\beta_c(2)<0.88$. For perspective, the exact value in
+dimension two is known from the Onsager solution
+(see \S3.10.12 of the transcription):
+$\beta_c(2)=\tfrac12\log(1+\sqrt2)\approx0.4407$. Neither refinement is
+proved here.
+\end{remark}
+
+\end{document}

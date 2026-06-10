@@ -20,7 +20,8 @@
 
 % --- theorem environments --------------------------------------------------
 \theoremstyle{plain}
-\newtheorem{theorem}{Theorem}[section]
+\newtheorem{theorem}{Theorem}
+\renewcommand{\thetheorem}{3.\arabic{theorem}}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
@@ -46,7 +47,10 @@
 \newcommand{\meanp}[1]{\langle #1 \rangle^{+}}
 \newcommand{\meanm}[1]{\langle #1 \rangle^{-}}
 \newcommand{\bc}{\mathscr{B}}
-\setcounter{section}{3}
+% Sections render as 3.1--3.10 and results as 3.x, mirroring the book's
+% Chapter 3; the theorem counter is advanced manually where the book's
+% numbering has gaps (results not transcribed here).
+\renewcommand{\thesection}{3.\arabic{section}}
 
 \title{\textbf{The Ising Model}\\[4pt]
 \large Structured reference transcription of Chapter 3 of\\
@@ -83,7 +87,7 @@ j\,\}$ the nearest-neighbour edges, the energy of $\omega$ is
 with inverse temperature $\beta\in\Rgeq$ and magnetic field $h\in\R$. The
 superscript $\varnothing$ marks the free boundary condition.
 
-\begin{definition}[3.1]
+\begin{definition}
 The Gibbs distribution of the Ising model in $\La$ with free boundary condition
 is the probability measure on $\Omega_\La$
 \[
@@ -96,13 +100,13 @@ is the probability measure on $\Omega_\La$
 \]
 \end{definition}
 
-\begin{definition}[3.2]
+\begin{definition}
 The Gibbs distribution in the box $V_n$ with \emph{periodic} boundary condition
 is defined analogously, with the Hamiltonian summed over the edges of the torus
 (nearest-neighbour pairs taken modulo the side length).
 \end{definition}
 
-\begin{definition}[3.3]
+\begin{definition}
 The Gibbs distribution of the Ising model in $\La$ with boundary condition
 $\eta\in\Omega$ uses the Hamiltonian
 \[
@@ -124,7 +128,7 @@ finite volumes invading $\Z^d$ with vanishing relative boundary. The boxes
 $B(n)=\{-n,\dots,n\}^d$ are the canonical example.
 
 \subsection{Pressure}
-\begin{definition}[3.4]
+\begin{definition}
 The (finite-volume) pressure with boundary condition of type $\bdy$ is
 \[
   \psi^{\bdy}_\La(\beta,h)
@@ -132,12 +136,12 @@ The (finite-volume) pressure with boundary condition of type $\bdy$ is
 \]
 \end{definition}
 
-\begin{lemma}[3.5]
+\begin{lemma}
 For each type of boundary condition $\bdy$, the map
 $(\beta,h)\mapsto\psi^{\bdy}_\La(\beta,h)$ is convex.
 \end{lemma}
 
-\begin{theorem}[3.6]
+\begin{theorem}
 In the thermodynamic limit, the pressure
 \[
   \psi(\beta,h) = \lim_{\La\incr\Z^d} \psi^{\bdy}_\La(\beta,h)
@@ -154,7 +158,7 @@ $m^{\bdy}_\La(\beta,h)=\frac1{|\La|}\sum_{i\in\La}\avg{\sg_i}^{\bdy}_\La
 =\partial_h\psi^{\bdy}_\La$. Let $\bc_\beta$ be the (at most countable) set of
 $h$ at which $h\mapsto\psi(\beta,h)$ fails to be differentiable.
 
-\begin{corollary}[3.7]
+\begin{corollary}
 For all $h\notin\bc_\beta$, the average magnetization density
 $m(\beta,h)=\partial_h\psi(\beta,h)$ exists and equals
 $\lim_{\La\incr\Z^d} m^{\bdy}_\La(\beta,h)$, independently of the boundary
@@ -162,7 +166,7 @@ condition.
 \end{corollary}
 
 \subsection{A first definition of phase transition}
-\begin{definition}[3.8]
+\begin{definition}
 The pressure $\psi$ exhibits a \emph{first-order phase transition} at
 $(\beta,h)$ if $h\mapsto\psi(\beta,h)$ is not differentiable there, i.e.
 $\frac{\partial\psi}{\partial h^-}(\beta,h)
@@ -172,7 +176,7 @@ $\frac{\partial\psi}{\partial h^-}(\beta,h)
 % ===========================================================================
 \section{The one-dimensional Ising model}
 % ===========================================================================
-\begin{theorem}[3.9 $(d=1)$]
+\begin{theorem}[$d=1$]
 For all $\beta\ge0$ and $h\in\R$, the pressure of the one-dimensional Ising
 model is
 \[
@@ -186,7 +190,7 @@ so $\bc_\beta=\varnothing$: there is \emph{no} phase transition in $d=1$.
 \noindent The proof uses the transfer-matrix method: $Z$ is a trace of a
 product of $2\times2$ matrices, and $\psi$ is the log of the largest eigenvalue.
 
-\begin{theorem}[3.10 $(d=1)$]
+\begin{theorem}[$d=1$]
 Let $0<\beta<\infty$ and $\La_n\incr\Z$ with arbitrary boundary condition. For
 all $\epsilon>0$ there is $c=c(\beta,\epsilon)>0$ such that, for $n$ large,
 \[
@@ -200,30 +204,32 @@ magnetization concentrates at $0$.)
 % ===========================================================================
 \section{Infinite-volume Gibbs states}
 % ===========================================================================
-\begin{definition}[3.11]
+\begin{definition}
 A function $f:\Omega\to\R$ is \emph{local} if it depends on finitely many spins,
 i.e. there is $\Delta\fin\Z^d$ with $f(\omega)=f(\omega')$ whenever
 $\omega|_\Delta=\omega'|_\Delta$.
 \end{definition}
 
-\begin{definition}[3.13]
+\setcounter{theorem}{12}% book numbering gap (3.12 not transcribed)
+\begin{definition}
 An (infinite-volume) \emph{state} is a normalized, positive linear functional
 $\avg{\cdot}$ on local functions.
 \end{definition}
 
-\begin{definition}[3.14]
+\begin{definition}
 Given $\La_n\uparrow\Z^d$ and boundary conditions $(\bdy_n)$, the associated
 infinite-volume Gibbs state is the limit
 $\avg{f}=\lim_n \avg{f}^{\bdy_n}_{\La_n;\beta,h}$ for all local $f$, when it
 exists.
 \end{definition}
 
-\begin{definition}[3.16]
+\setcounter{theorem}{15}% book numbering gap (3.15 not transcribed)
+\begin{definition}
 A state $\avg{\cdot}$ is \emph{translation invariant} if
 $\avg{f\circ\theta_j}=\avg{f}$ for every local $f$ and every $j\in\Z^d$.
 \end{definition}
 
-\begin{theorem}[3.17]
+\begin{theorem}
 Let $\beta\ge0$, $h\in\R$. Along any sequence $\La_n\uparrow\Z^d$, the
 finite-volume Gibbs distributions with $+$ (resp.\ $-$) boundary condition
 converge to infinite-volume Gibbs states
@@ -242,7 +248,8 @@ nondecreasing local functions.
 % ===========================================================================
 \section{Two families of local functions}
 % ===========================================================================
-\begin{lemma}[3.19]
+\setcounter{theorem}{18}% book numbering gap (3.18 not transcribed)
+\begin{lemma}
 Every local $f$ admits a finite expansion
 $f=\sum_{A\subset\mathrm{supp}(f)} \hat f_A\,\sg_A$ in the monomials
 $\sg_A=\prod_{i\in A}\sg_i$, with real coefficients $\hat f_A$. Consequently
@@ -256,7 +263,7 @@ variables $n_i=\tfrac{1+\sg_i}{2}$, $n_A=\prod_{i\in A} n_i$.
 % ===========================================================================
 
 \subsection{The GKS inequalities}
-\begin{theorem}[3.20, GKS inequalities]
+\begin{theorem}[GKS inequalities]
 Let $J\ge0$, $h\ge0$ and $\La\fin\Z^d$. Then for all $A,B\subset\La$,
 \[
   \meanp{\sg_A}_{\La;J,h}\ge0,\qquad
@@ -267,7 +274,7 @@ The inequalities also hold for free and periodic boundary conditions.
 \end{theorem}
 
 \subsection{The FKG inequality}
-\begin{theorem}[3.21, FKG inequality]
+\begin{theorem}[FKG inequality]
 Let $J=(J_{ij})\ge0$, $h=(h_i)\in\R^{\Z^d}$ arbitrary, $\La\fin\Z^d$, and
 $\bdy$ any boundary condition. Then for any pair of nondecreasing functions
 $f,g$,
@@ -279,7 +286,7 @@ $f,g$,
 \end{theorem}
 
 \subsection{Consequences (monotonicity)}
-\begin{lemma}[3.22]
+\begin{lemma}
 For nondecreasing $f$ and $\La_1\subset\La_2\fin\Z^d$,
 $\avg{f}^{+}_{\La_1}\ge\avg{f}^{+}_{\La_2}$ and
 $\avg{f}^{-}_{\La_1}\le\avg{f}^{-}_{\La_2}$: increasing the volume under $+$
@@ -287,7 +294,7 @@ b.c.\ decreases the expectation of any nondecreasing $f$ (and conversely under
 $-$).
 \end{lemma}
 
-\begin{lemma}[3.23]
+\begin{lemma}
 For any nondecreasing $f$, $\beta\ge0$ and arbitrary boundary condition $\eta$,
 $\meanm{f}_{\La;\beta,h}\le\avg{f}^{\eta}_{\La;\beta,h}\le\meanp{f}_{\La;\beta,h}$.
 The $+$ and $-$ states dominate all others. These monotonicity facts are what
@@ -297,13 +304,13 @@ make the limits in Theorem 3.17 exist.
 % ===========================================================================
 \section{Phase diagram}
 % ===========================================================================
-\begin{definition}[3.24]
+\begin{definition}
 If at least two distinct Gibbs states can be constructed for a pair
 $(\beta,h)$, one says there is \emph{non-uniqueness} (a phase transition) at
 $(\beta,h)$.
 \end{definition}
 
-\begin{theorem}[3.25, main result]\leavevmode
+\begin{theorem}[main result]\leavevmode
 \begin{enumerate}
   \item In any $d\ge1$, when $h\neq0$ there is a \emph{unique} Gibbs state for
         all $\beta\in\Rgeq$.
@@ -323,7 +330,8 @@ transition) by the Peierls argument and high-temperature uniqueness; items 1--2
 by the Lee--Yang analyticity argument.
 
 \subsection{Two criteria for (non)-uniqueness}
-\begin{theorem}[3.28]
+\setcounter{theorem}{27}% book numbering gap (3.26--3.27 not transcribed)
+\begin{theorem}
 For $(\beta,h)\in\Rgeq\times\R$ the following are equivalent:
 \begin{enumerate}
   \item there is a unique Gibbs state at $(\beta,h)$;
@@ -333,19 +341,20 @@ For $(\beta,h)\in\Rgeq\times\R$ the following are equivalent:
 Thus uniqueness is detected by a single one-point function.
 \end{theorem}
 
-\begin{proposition}[3.29]
+\begin{proposition}
 For any $\La\incr\Z^d$ the limits $m^{+}(\beta,h)=\meanp{\sg_0}_{\beta,h}$ and
 $m^{-}(\beta,h)=\meanm{\sg_0}_{\beta,h}$ exist; $m^{+}$ is right-continuous,
 $m^{-}$ left-continuous in $h$, and $m^{-}=-m^{+}$ by spin-flip symmetry.
 \end{proposition}
 
-\begin{lemma}[3.31]
+\setcounter{theorem}{30}% book numbering gap (3.30 not transcribed)
+\begin{lemma}
 For all $\beta\ge0$, $h\mapsto\meanp{\sg_0}_{\beta,h}$ is nondecreasing and
 right-continuous (analogous statements for $\meanm{\sg_0}$). This yields the
 one-sided continuity of $m^{\pm}$.
 \end{lemma}
 
-\begin{definition}[3.32]
+\begin{definition}
 The \emph{critical inverse temperature} is
 \[
   \beta_c(d) = \inf\{\beta\ge0 : m^*(\beta)>0\}
@@ -355,7 +364,8 @@ where $m^*(\beta)=\meanp{\sg_0}_{\beta,0}$ is the spontaneous magnetization. At
 $h=0$, uniqueness is equivalent to $m^*(\beta)=0$.
 \end{definition}
 
-\begin{theorem}[3.34]
+\setcounter{theorem}{33}% book numbering gap (3.33 not transcribed)
+\begin{theorem}
 For all $\beta\ge0$, $h\in\R$,
 \[
   \frac{\partial\psi}{\partial h^+}(\beta,h)=m^{+}(\beta,h),\qquad
@@ -371,7 +381,8 @@ For $h=0$, $d=2$, in the box $B(n)$ with $+$ boundary condition, each
 configuration is described by a family of \emph{contours} (closed dual circuits
 separating $+$ and $-$ regions).
 
-\begin{lemma}[3.37, Peierls' estimate]
+\setcounter{theorem}{36}% book numbering gap (3.35--3.36 not transcribed)
+\begin{lemma}[Peierls' estimate]
 For all $\beta>0$ and any contour $\gamma^*$,
 \[
   \mu^{+}_{B(n);\beta,0}(\Gamma\ni\gamma^*) \le e^{-2\beta|\gamma^*|}. \tag{3.34}
@@ -384,7 +395,7 @@ number, Lemma 3.38), one gets $\meanp{\sg_0}_{\beta,0}>0$ for $\beta$ large
 enough, hence $\beta_c(d)<\infty$ for $d\ge2$, with the explicit bound
 $\beta_c(2)<0.88$ (Exercise 3.21).
 
-\begin{lemma}[3.38]
+\begin{lemma}
 Combinatorial bound on the number of contours of a given length through a fixed
 edge, obtained by an Eulerian traversal of a connected graph: a connected graph
 with $N$ edges admits a closed walk using each edge at most twice.
@@ -398,7 +409,8 @@ correlations and therefore $m^*(\beta)=0$, i.e. uniqueness for $\beta<\beta_c$,
 and $\beta_c(d)>0$.
 
 \subsection{Uniqueness in nonzero magnetic field}
-\begin{theorem}[3.40]
+\setcounter{theorem}{39}% book numbering gap (3.39 not transcribed)
+\begin{theorem}
 Let $\beta>0$. As a function of $h$, the thermodynamic-limit pressure
 $\psi=\psi(h)$ extends from $\{h>0\}$ (resp.\ $\{h<0\}$) to an analytic function
 on the right half-plane $H^+$ (resp.\ $H^-$); on $H^\pm$ it can be computed via
@@ -407,14 +419,15 @@ the free-boundary thermodynamic limit.
 \noindent By Theorem 3.34 analyticity in $h$ forces a unique Gibbs state, so
 Theorem 3.40 yields item 1 of Theorem 3.25 (uniqueness for all $h\neq0$).
 
-\begin{theorem}[3.42, Lee--Yang]
+\setcounter{theorem}{41}% book numbering gap (3.41 not transcribed)
+\begin{theorem}[Lee--Yang]
 Let $\beta\ge0$ and let $D\subset\C$ be open, simply connected, with $D\cap\R$
 an interval. If, for every finite volume $\La\fin\Z^d$, the partition function
 satisfies $Z^{\varnothing}_{\La;\beta,h}\neq0$ for all $h\in D$, then the
 pressure $h\mapsto\psi(h)$ admits an analytic continuation to $D$.
 \end{theorem}
 
-\begin{theorem}[3.43, Lee--Yang Circle Theorem]
+\begin{theorem}[Lee--Yang Circle Theorem]
 The hypothesis of Theorem 3.42 holds with $D=H^+$ and $D=H^-$. Equivalently, in
 the variable $z=e^{-2h}$ all zeros of the partition function lie on the unit
 circle $|z|=1$ (i.e.\ at purely imaginary $h$). This is what supplies the

@@ -1,0 +1,479 @@
+\documentclass[11pt]{article}
+
+% ============================================================================
+%  The Ising Model
+%  Structured LaTeX transcription of Chapter 3 of
+%    S. Friedli & Y. Velenik, "Statistical Mechanics of Lattice Systems:
+%    a Concrete Mathematical Introduction" (Cambridge University Press, 2017).
+%
+%  This file reproduces the chapter's organization, numbered definitions and
+%  theorem statements, and connecting exposition, for use as a reference while
+%  formalizing the model in Lean. Proofs are summarized, not transcribed
+%  verbatim.  Equation/result numbering follows the source.
+% ============================================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools,mathrsfs}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+% --- theorem environments --------------------------------------------------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{exercise}[theorem]{Exercise}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% --- notation --------------------------------------------------------------
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Rgeq}{\R_{\ge 0}}
+\newcommand{\fin}{\Subset}          % finite subset of Z^d
+\newcommand{\incr}{\Uparrow}        % van Hove / increasing convergence to Z^d
+\newcommand{\La}{\Lambda}
+\newcommand{\sg}{\sigma}
+\newcommand{\Ham}{\mathcal{H}}
+\newcommand{\Eset}{\mathscr{E}}
+\newcommand{\bdy}{\#}
+\newcommand{\avg}[1]{\langle #1 \rangle}
+\newcommand{\meanp}[1]{\langle #1 \rangle^{+}}
+\newcommand{\meanm}[1]{\langle #1 \rangle^{-}}
+\newcommand{\bc}{\mathscr{B}}
+\setcounter{section}{3}
+
+\title{\textbf{The Ising Model}\\[4pt]
+\large Structured reference transcription of Chapter 3 of\\
+Friedli \& Velenik, \emph{Statistical Mechanics of Lattice Systems}}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent
+We study the Ising model on $\Z^d$, giving precise definitions and a detailed
+analysis of the conditions ensuring the existence or absence of a phase
+transition. The plan: \S3.1 defines the model with various boundary conditions;
+\S3.2 introduces the thermodynamic limit, the pressure and the magnetization,
+computed explicitly for $d=1$ in \S3.3; \S3.4 defines infinite-volume Gibbs
+states; \S3.6 develops correlation inequalities (GKS, FKG); \S3.7 analyzes the
+phase diagram, proving a phase transition at $h=0$, $d\ge 2$, $\beta$ large
+(Peierls), uniqueness at high temperature, and uniqueness at $h\neq0$
+(Lee--Yang); \S3.10 collects complements.
+
+% ===========================================================================
+\section{Finite-volume Gibbs distributions}
+% ===========================================================================
+Configurations of the Ising model in a finite volume $\La \fin \Z^d$ with
+\emph{free} boundary condition form $\Omega_\La = \{-1,1\}^\La$. The spin at
+$i$ is $\sg_i(\omega)=\omega_i$. With $\Eset_\La = \{\,\{i,j\}\subset\La : i\sim
+j\,\}$ the nearest-neighbour edges, the energy of $\omega$ is
+\[
+  \Ham^{\varnothing}_{\La;\beta,h}(\omega)
+    = -\beta \sum_{\{i,j\}\in\Eset_\La} \sg_i(\omega)\sg_j(\omega)
+      - h \sum_{i\in\La} \sg_i(\omega),
+\]
+with inverse temperature $\beta\in\Rgeq$ and magnetic field $h\in\R$. The
+superscript $\varnothing$ marks the free boundary condition.
+
+\begin{definition}[3.1]
+The Gibbs distribution of the Ising model in $\La$ with free boundary condition
+is the probability measure on $\Omega_\La$
+\[
+  \mu^{\varnothing}_{\La;\beta,h}(\omega)
+    = \frac{e^{-\Ham^{\varnothing}_{\La;\beta,h}(\omega)}}
+           {Z^{\varnothing}_{\La;\beta,h}},
+  \qquad
+  Z^{\varnothing}_{\La;\beta,h}
+    = \sum_{\omega\in\Omega_\La} e^{-\Ham^{\varnothing}_{\La;\beta,h}(\omega)} .
+\]
+\end{definition}
+
+\begin{definition}[3.2]
+The Gibbs distribution in the box $V_n$ with \emph{periodic} boundary condition
+is defined analogously, with the Hamiltonian summed over the edges of the torus
+(nearest-neighbour pairs taken modulo the side length).
+\end{definition}
+
+\begin{definition}[3.3]
+The Gibbs distribution of the Ising model in $\La$ with boundary condition
+$\eta\in\Omega$ uses the Hamiltonian
+\[
+  \Ham^{\eta}_{\La;\beta,h}(\omega)
+    = -\beta \!\!\sum_{\substack{\{i,j\}\cap\La\neq\varnothing}}\!\!
+        \sg_i \sg_j - h\sum_{i\in\La}\sg_i,
+\]
+where spins outside $\La$ are frozen to $\eta$. The special cases $\eta\equiv+1$
+and $\eta\equiv-1$ give the $+$ and $-$ boundary conditions.
+\end{definition}
+
+% ===========================================================================
+\section{Thermodynamic limit, pressure and magnetization}
+% ===========================================================================
+
+\subsection{Convergence of subsets}
+We write $\La\incr\Z^d$ (van Hove convergence) for an increasing sequence of
+finite volumes invading $\Z^d$ with vanishing relative boundary. The boxes
+$B(n)=\{-n,\dots,n\}^d$ are the canonical example.
+
+\subsection{Pressure}
+\begin{definition}[3.4]
+The (finite-volume) pressure with boundary condition of type $\bdy$ is
+\[
+  \psi^{\bdy}_\La(\beta,h)
+    = \frac{1}{|\La|}\log Z^{\bdy}_{\La;\beta,h}.
+\]
+\end{definition}
+
+\begin{lemma}[3.5]
+For each type of boundary condition $\bdy$, the map
+$(\beta,h)\mapsto\psi^{\bdy}_\La(\beta,h)$ is convex.
+\end{lemma}
+
+\begin{theorem}[3.6]
+In the thermodynamic limit, the pressure
+\[
+  \psi(\beta,h) = \lim_{\La\incr\Z^d} \psi^{\bdy}_\La(\beta,h)
+\]
+is well defined, independent of the sequence $\La\incr\Z^d$ and of the type of
+boundary condition. Moreover $\psi$ is convex on $\Rgeq\times\R$ and even in $h$.
+\end{theorem}
+\noindent The proof uses subadditivity for the free boundary condition, then
+shows boundary conditions and the choice of sequence do not affect the limit.
+
+\subsection{Magnetization}
+The average magnetization density in $\La$ is
+$m^{\bdy}_\La(\beta,h)=\frac1{|\La|}\sum_{i\in\La}\avg{\sg_i}^{\bdy}_\La
+=\partial_h\psi^{\bdy}_\La$. Let $\bc_\beta$ be the (at most countable) set of
+$h$ at which $h\mapsto\psi(\beta,h)$ fails to be differentiable.
+
+\begin{corollary}[3.7]
+For all $h\notin\bc_\beta$, the average magnetization density
+$m(\beta,h)=\partial_h\psi(\beta,h)$ exists and equals
+$\lim_{\La\incr\Z^d} m^{\bdy}_\La(\beta,h)$, independently of the boundary
+condition.
+\end{corollary}
+
+\subsection{A first definition of phase transition}
+\begin{definition}[3.8]
+The pressure $\psi$ exhibits a \emph{first-order phase transition} at
+$(\beta,h)$ if $h\mapsto\psi(\beta,h)$ is not differentiable there, i.e.
+$\frac{\partial\psi}{\partial h^-}(\beta,h)
+   <\frac{\partial\psi}{\partial h^+}(\beta,h)$.
+\end{definition}
+
+% ===========================================================================
+\section{The one-dimensional Ising model}
+% ===========================================================================
+\begin{theorem}[3.9 $(d=1)$]
+For all $\beta\ge0$ and $h\in\R$, the pressure of the one-dimensional Ising
+model is
+\[
+  \psi(\beta,h)
+    = \log\!\Big\{ e^{\beta}\cosh(h)
+        + \sqrt{ e^{2\beta}\cosh^2(h) - 2\sinh(2\beta)}\,\Big\}. \tag{3.10}
+\]
+In particular $h\mapsto\psi(\beta,h)$ is real-analytic for every $\beta\ge0$,
+so $\bc_\beta=\varnothing$: there is \emph{no} phase transition in $d=1$.
+\end{theorem}
+\noindent The proof uses the transfer-matrix method: $Z$ is a trace of a
+product of $2\times2$ matrices, and $\psi$ is the log of the largest eigenvalue.
+
+\begin{theorem}[3.10 $(d=1)$]
+Let $0<\beta<\infty$ and $\La_n\incr\Z$ with arbitrary boundary condition. For
+all $\epsilon>0$ there is $c=c(\beta,\epsilon)>0$ such that, for $n$ large,
+\[
+  \mu^{\bdy}_{\La_n;\beta,0}\big( m_{\La_n}\notin(-\epsilon,\epsilon)\big)
+    \le e^{-c|\La_n|}. \tag{3.12}
+\]
+\end{theorem}
+\noindent (A large-deviation/concentration statement: at $h=0$ the empirical
+magnetization concentrates at $0$.)
+
+% ===========================================================================
+\section{Infinite-volume Gibbs states}
+% ===========================================================================
+\begin{definition}[3.11]
+A function $f:\Omega\to\R$ is \emph{local} if it depends on finitely many spins,
+i.e. there is $\Delta\fin\Z^d$ with $f(\omega)=f(\omega')$ whenever
+$\omega|_\Delta=\omega'|_\Delta$.
+\end{definition}
+
+\begin{definition}[3.13]
+An (infinite-volume) \emph{state} is a normalized, positive linear functional
+$\avg{\cdot}$ on local functions.
+\end{definition}
+
+\begin{definition}[3.14]
+Given $\La_n\uparrow\Z^d$ and boundary conditions $(\bdy_n)$, the associated
+infinite-volume Gibbs state is the limit
+$\avg{f}=\lim_n \avg{f}^{\bdy_n}_{\La_n;\beta,h}$ for all local $f$, when it
+exists.
+\end{definition}
+
+\begin{definition}[3.16]
+A state $\avg{\cdot}$ is \emph{translation invariant} if
+$\avg{f\circ\theta_j}=\avg{f}$ for every local $f$ and every $j\in\Z^d$.
+\end{definition}
+
+\begin{theorem}[3.17]
+Let $\beta\ge0$, $h\in\R$. Along any sequence $\La_n\uparrow\Z^d$, the
+finite-volume Gibbs distributions with $+$ (resp.\ $-$) boundary condition
+converge to infinite-volume Gibbs states
+\[
+  \meanp{\cdot}_{\beta,h}=\lim_{n}\avg{\cdot}^{+}_{\La_n;\beta,h},
+  \qquad
+  \meanm{\cdot}_{\beta,h}=\lim_{n}\avg{\cdot}^{-}_{\La_n;\beta,h},
+\]
+independently of the sequence. These are translation-invariant Gibbs states,
+extremal in the sense that $\meanp{\cdot}\ge\avg{\cdot}\ge\meanm{\cdot}$ on
+nondecreasing local functions.
+\end{theorem}
+\noindent The proof relies on monotonicity in the volume and boundary condition
+(FKG / Lemma 3.22--3.23) together with the polynomial expansion Lemma 3.19.
+
+% ===========================================================================
+\section{Two families of local functions}
+% ===========================================================================
+\begin{lemma}[3.19]
+Every local $f$ admits a finite expansion
+$f=\sum_{A\subset\mathrm{supp}(f)} \hat f_A\,\sg_A$ in the monomials
+$\sg_A=\prod_{i\in A}\sg_i$, with real coefficients $\hat f_A$. Consequently
+agreement of all correlation functions $\avg{\sg_A}$ determines a state.
+\end{lemma}
+\noindent The two basic monotone families are $\sg_A$ and the occupation
+variables $n_i=\tfrac{1+\sg_i}{2}$, $n_A=\prod_{i\in A} n_i$.
+
+% ===========================================================================
+\section{Correlation inequalities}
+% ===========================================================================
+
+\subsection{The GKS inequalities}
+\begin{theorem}[3.20, GKS inequalities]
+Let $J\ge0$, $h\ge0$ and $\La\fin\Z^d$. Then for all $A,B\subset\La$,
+\[
+  \meanp{\sg_A}_{\La;J,h}\ge0,\qquad
+  \meanp{\sg_A\sg_B}_{\La;J,h}
+     \ge \meanp{\sg_A}_{\La;J,h}\meanp{\sg_B}_{\La;J,h}. \tag{3.21--3.22}
+\]
+The inequalities also hold for free and periodic boundary conditions.
+\end{theorem}
+
+\subsection{The FKG inequality}
+\begin{theorem}[3.21, FKG inequality]
+Let $J=(J_{ij})\ge0$, $h=(h_i)\in\R^{\Z^d}$ arbitrary, $\La\fin\Z^d$, and
+$\bdy$ any boundary condition. Then for any pair of nondecreasing functions
+$f,g$,
+\[
+  \avg{fg}^{\bdy}_{\La;J,h}
+    \ge \avg{f}^{\bdy}_{\La;J,h}\,\avg{g}^{\bdy}_{\La;J,h}. \tag{3.24}
+\]
+(The inequality reverses if $g$ is nonincreasing.)
+\end{theorem}
+
+\subsection{Consequences (monotonicity)}
+\begin{lemma}[3.22]
+For nondecreasing $f$ and $\La_1\subset\La_2\fin\Z^d$,
+$\avg{f}^{+}_{\La_1}\ge\avg{f}^{+}_{\La_2}$ and
+$\avg{f}^{-}_{\La_1}\le\avg{f}^{-}_{\La_2}$: increasing the volume under $+$
+b.c.\ decreases the expectation of any nondecreasing $f$ (and conversely under
+$-$).
+\end{lemma}
+
+\begin{lemma}[3.23]
+For any nondecreasing $f$, $\beta\ge0$ and arbitrary boundary condition $\eta$,
+$\meanm{f}_{\La;\beta,h}\le\avg{f}^{\eta}_{\La;\beta,h}\le\meanp{f}_{\La;\beta,h}$.
+The $+$ and $-$ states dominate all others. These monotonicity facts are what
+make the limits in Theorem 3.17 exist.
+\end{lemma}
+
+% ===========================================================================
+\section{Phase diagram}
+% ===========================================================================
+\begin{definition}[3.24]
+If at least two distinct Gibbs states can be constructed for a pair
+$(\beta,h)$, one says there is \emph{non-uniqueness} (a phase transition) at
+$(\beta,h)$.
+\end{definition}
+
+\begin{theorem}[3.25, main result]\leavevmode
+\begin{enumerate}
+  \item In any $d\ge1$, when $h\neq0$ there is a \emph{unique} Gibbs state for
+        all $\beta\in\Rgeq$.
+  \item In $d=1$, there is a unique Gibbs state at every $(\beta,h)$.
+  \item When $h=0$ and $d\ge2$, there exists
+        $\beta_c=\beta_c(d)\in(0,\infty)$ such that:
+        \begin{itemize}
+          \item for $\beta<\beta_c$ the Gibbs state at $(\beta,0)$ is unique;
+          \item for $\beta>\beta_c$ a first-order phase transition occurs,
+                $\meanp{\cdot}_{\beta,0}\neq\meanm{\cdot}_{\beta,0}$
+                (spontaneous magnetization $m^*(\beta)>0$).
+        \end{itemize}
+\end{enumerate}
+\end{theorem}
+\noindent The proof is spread over the next sections: item 3 (existence of a
+transition) by the Peierls argument and high-temperature uniqueness; items 1--2
+by the Lee--Yang analyticity argument.
+
+\subsection{Two criteria for (non)-uniqueness}
+\begin{theorem}[3.28]
+For $(\beta,h)\in\Rgeq\times\R$ the following are equivalent:
+\begin{enumerate}
+  \item there is a unique Gibbs state at $(\beta,h)$;
+  \item $\meanp{\cdot}_{\beta,h}=\meanm{\cdot}_{\beta,h}$;
+  \item $\meanp{\sg_0}_{\beta,h}=\meanm{\sg_0}_{\beta,h}$.
+\end{enumerate}
+Thus uniqueness is detected by a single one-point function.
+\end{theorem}
+
+\begin{proposition}[3.29]
+For any $\La\incr\Z^d$ the limits $m^{+}(\beta,h)=\meanp{\sg_0}_{\beta,h}$ and
+$m^{-}(\beta,h)=\meanm{\sg_0}_{\beta,h}$ exist; $m^{+}$ is right-continuous,
+$m^{-}$ left-continuous in $h$, and $m^{-}=-m^{+}$ by spin-flip symmetry.
+\end{proposition}
+
+\begin{lemma}[3.31]
+For all $\beta\ge0$, $h\mapsto\meanp{\sg_0}_{\beta,h}$ is nondecreasing and
+right-continuous (analogous statements for $\meanm{\sg_0}$). This yields the
+one-sided continuity of $m^{\pm}$.
+\end{lemma}
+
+\begin{definition}[3.32]
+The \emph{critical inverse temperature} is
+\[
+  \beta_c(d) = \inf\{\beta\ge0 : m^*(\beta)>0\}
+             = \sup\{\beta\ge0 : m^*(\beta)=0\},
+\]
+where $m^*(\beta)=\meanp{\sg_0}_{\beta,0}$ is the spontaneous magnetization. At
+$h=0$, uniqueness is equivalent to $m^*(\beta)=0$.
+\end{definition}
+
+\begin{theorem}[3.34]
+For all $\beta\ge0$, $h\in\R$,
+\[
+  \frac{\partial\psi}{\partial h^+}(\beta,h)=m^{+}(\beta,h),\qquad
+  \frac{\partial\psi}{\partial h^-}(\beta,h)=m^{-}(\beta,h).
+\]
+Hence $h\mapsto\psi(\beta,h)$ is differentiable at $h$ \emph{iff} there is a
+unique Gibbs state at $(\beta,h)$: the analytic notion of first-order transition
+(Definition 3.8) coincides with the probabilistic notion of non-uniqueness.
+\end{theorem}
+
+\subsection{Spontaneous symmetry breaking at low temperature (Peierls)}
+For $h=0$, $d=2$, in the box $B(n)$ with $+$ boundary condition, each
+configuration is described by a family of \emph{contours} (closed dual circuits
+separating $+$ and $-$ regions).
+
+\begin{lemma}[3.37, Peierls' estimate]
+For all $\beta>0$ and any contour $\gamma^*$,
+\[
+  \mu^{+}_{B(n);\beta,0}(\Gamma\ni\gamma^*) \le e^{-2\beta|\gamma^*|}. \tag{3.34}
+\]
+The probability of a fixed contour decays exponentially in its length: the
+ground state $\eta^+$ is \emph{stable} at large $\beta$.
+\end{lemma}
+\noindent Summing over contours surrounding the origin (and controlling their
+number, Lemma 3.38), one gets $\meanp{\sg_0}_{\beta,0}>0$ for $\beta$ large
+enough, hence $\beta_c(d)<\infty$ for $d\ge2$, with the explicit bound
+$\beta_c(2)<0.88$ (Exercise 3.21).
+
+\begin{lemma}[3.38]
+Combinatorial bound on the number of contours of a given length through a fixed
+edge, obtained by an Eulerian traversal of a connected graph: a connected graph
+with $N$ edges admits a closed walk using each edge at most twice.
+\end{lemma}
+
+\subsection{Uniqueness at high temperature}
+A high-temperature (small-$\beta$) expansion represents the two-point function
+$\avg{\sg_i\sg_j}^{+}_{\beta,0}$ as a sum over collections of edges/paths. For
+$\beta$ small the geometric weight is summable, giving exponential decay of
+correlations and therefore $m^*(\beta)=0$, i.e. uniqueness for $\beta<\beta_c$,
+and $\beta_c(d)>0$.
+
+\subsection{Uniqueness in nonzero magnetic field}
+\begin{theorem}[3.40]
+Let $\beta>0$. As a function of $h$, the thermodynamic-limit pressure
+$\psi=\psi(h)$ extends from $\{h>0\}$ (resp.\ $\{h<0\}$) to an analytic function
+on the right half-plane $H^+$ (resp.\ $H^-$); on $H^\pm$ it can be computed via
+the free-boundary thermodynamic limit.
+\end{theorem}
+\noindent By Theorem 3.34 analyticity in $h$ forces a unique Gibbs state, so
+Theorem 3.40 yields item 1 of Theorem 3.25 (uniqueness for all $h\neq0$).
+
+\begin{theorem}[3.42, Lee--Yang]
+Let $\beta\ge0$ and let $D\subset\C$ be open, simply connected, with $D\cap\R$
+an interval. If, for every finite volume $\La\fin\Z^d$, the partition function
+satisfies $Z^{\varnothing}_{\La;\beta,h}\neq0$ for all $h\in D$, then the
+pressure $h\mapsto\psi(h)$ admits an analytic continuation to $D$.
+\end{theorem}
+
+\begin{theorem}[3.43, Lee--Yang Circle Theorem]
+The hypothesis of Theorem 3.42 holds with $D=H^+$ and $D=H^-$. Equivalently, in
+the variable $z=e^{-2h}$ all zeros of the partition function lie on the unit
+circle $|z|=1$ (i.e.\ at purely imaginary $h$). This is what supplies the
+no-zero condition needed for Theorem 3.40.
+\end{theorem}
+
+\subsection{Summary of what has been proved}
+Combining: a first-order phase transition at $(\beta,0)$ for $\beta>\beta_c(d)$,
+$d\ge2$ (Peierls); uniqueness for $\beta<\beta_c(d)$ (high-temperature
+expansion); and uniqueness for all $h\neq0$ and all $d$ (Lee--Yang). Together
+these establish the full phase diagram of Theorem 3.25.
+
+% ===========================================================================
+\section{Proofs of the correlation inequalities}
+% ===========================================================================
+\S3.8.1 proves the GKS inequalities (Theorem 3.20) by expanding products of
+$\sg_A$ and using that all coefficients of $e^{\beta\sg_i\sg_j}$,
+$e^{h\sg_i}$ are nonnegative when $\beta,h\ge0$. \S3.8.2 proves the FKG
+inequality (Theorem 3.21) from the FKG lattice condition (Holley's inequality /
+the Harris--FKG correlation inequality for monotone measures).
+
+% ===========================================================================
+\section{Bibliographical references}
+% ===========================================================================
+Pointers to Ising, Peierls, Griffiths--Kelly--Sherman, Fortuin--Kasteleyn--
+Ginibre, Lee--Yang, and the historical literature on the model.
+
+% ===========================================================================
+\section{Complements}
+% ===========================================================================
+A series of more advanced or specialized topics, treated less formally:
+\begin{itemize}
+  \item[3.10.1] \textbf{Kramers--Wannier duality} — the self-duality of the 2D
+        model relating high- and low-temperature regimes and locating the
+        self-dual point $\beta_{\mathrm{sd}}$, conjecturally $=\beta_c(2)$.
+  \item[3.10.2] \textbf{Mean-field bounds} — comparison inequalities bounding
+        $m^*$ above/below by mean-field quantities.
+  \item[3.10.3] \textbf{An alternative proof of the FKG inequality.}
+  \item[3.10.4] \textbf{Transfer matrix and Markov chains} — the operator
+        viewpoint and its probabilistic interpretation.
+  \item[3.10.5] \textbf{The Ising antiferromagnet} ($J<0$) and the role of
+        bipartiteness.
+  \item[3.10.6] \textbf{Random-cluster and random-current representations} —
+        the FK/current geometric reformulations, percolation of clusters, and
+        the switching lemma.
+  \item[3.10.7] \textbf{Non-translation-invariant Gibbs states and interfaces}
+        — Dobrushin states in $d\ge3$, rigid interfaces, and their absence in
+        $d=2$.
+  \item[3.10.8] \textbf{Gibbs states and local behavior in large finite
+        systems.}
+  \item[3.10.9] \textbf{Absence of analytic continuation of the pressure}
+        through the transition point.
+  \item[3.10.10] \textbf{Metastable behavior in finite systems.}
+  \item[3.10.11] \textbf{Critical phenomena} — critical exponents, scaling, and
+        what is/ is not rigorously known.
+  \item[3.10.12] \textbf{Exact solution} — Onsager's solution in $d=2$ and the
+        explicit $\beta_c(2)=\tfrac12\log(1+\sqrt2)$.
+  \item[3.10.13] \textbf{Stochastic dynamics} — Glauber dynamics reversible
+        w.r.t.\ the Gibbs measure.
+\end{itemize}
+
+\end{document}

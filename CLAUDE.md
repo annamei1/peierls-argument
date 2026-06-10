@@ -19,14 +19,25 @@ and equation/result numbering follows the source.
 
 Flat, single-document repo — all paths are relative to the repo root:
 
-- `Ising_Model.tex` — the transcription. Section numbering starts at 3
-  (`\setcounter{section}{3}`) to mirror the book's Chapter 3. Theorem
-  environments (`theorem`, `lemma`, `proposition`, `corollary`, `definition`,
-  `exercise`, `remark`) are numbered within sections. Notation macros
+- `Ising_Model.tex` — the transcription. Sections render as 3.1–3.10
+  (`\renewcommand{\thesection}{3.\arabic{section}}`) to mirror the book's
+  Chapter 3. Theorem environments (`theorem`, `lemma`, `proposition`,
+  `corollary`, `definition`, `exercise`, `remark`) share one chapter-wide
+  counter rendering as 3.x, advanced manually (`\setcounter{theorem}{...}`)
+  where the book's numbering has gaps, so rendered result numbers match the
+  book exactly. Notation macros
   (`\Z`, `\La`, `\sg`, `\Ham`, `\fin`, `\incr`, `\meanp`, `\meanm`, …) live in
   the preamble — reuse them; do not introduce parallel notation.
 - `Ising_Model.pdf` — compiled output, kept in the repo and committed
   alongside `.tex` changes so the rendered document stays in sync.
+- `Peierls_Argument.tex` / `Peierls_Argument.pdf` — companion document with
+  the complete proof of the Peierls argument (expanding the summaries of
+  §3.7.2); clearly marked as an addition beyond the book transcription, and
+  kept in sync the same way.
+- `lean/Peierls/` — Lean 4 + Mathlib formalization of the Peierls argument
+  (sorry-free; main theorem `Peierls.peierls_argument`). See its `README.md`
+  for the design and verification commands. Build with `lake build` from
+  `lean/Peierls/`; do not commit `.lake/` build artifacts.
 - `README.md` — top-level overview.
 
 This file is the **single source of truth** for project rules.
